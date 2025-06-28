@@ -2,7 +2,6 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/quix-labs/filament-extendable.svg?style=flat-square)](https://packagist.org/packages/quix-labs/filament-extendable)
 [![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/quix-labs/filament-extendable/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/quix-labs/filament-extendable/actions?query=workflow%3Arun-tests+branch%3Amain)
-
 [![Total Downloads](https://img.shields.io/packagist/dt/quix-labs/filament-extendable.svg?style=flat-square)](https://packagist.org/packages/quix-labs/filament-extendable)
 
 **Filament Extendable** is a powerful extension toolkit for [FilamentPHP](https://filamentphp.com/), enabling highly
