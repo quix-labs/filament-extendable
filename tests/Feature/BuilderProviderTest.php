@@ -44,6 +44,18 @@ test('Ensure schema modifiers are executed in order', function () {
     expect($keys)->toBe(['name', 'password_10', 'password_20']);
 });
 
+test('Ensure schema modifiers are not stacked out of context', function (int $iter) {
+    static $identifier = "test-schema-stack";
+    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) use ($iter) {
+        $schemaBuilder->pushComponents([TextInput::make("password_iter_{$iter}")]);
+    }, $iter);
+
+    $schema = SchemaBuilder::process(schema: Schema::make(SchemaComponent::make()), identifier: $identifier);
+
+    $keys = array_keys($schema->getFlatComponents());
+    expect($keys)->toBe(["password_iter_{$iter}"]);
+})->with(range(0, 2));
+
 test('Ensure table can be extended at runtime', function () {
     static $identifier = "test-table";
     TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) {
@@ -60,7 +72,7 @@ test('Ensure table can be extended at runtime', function () {
 });
 
 test('Ensure table modifiers are executed in order', function () {
-    static $identifier = "test-table-order";
+    static $identifier = "test-table";
     TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) {
         $tableBuilder->pushColumns([TextColumn::make('password_20')]);
     }, 20);
@@ -76,3 +88,15 @@ test('Ensure table modifiers are executed in order', function () {
     $keys = array_keys($table->getColumns());
     expect($keys)->toBe(['name', 'password_10', 'password_20']);
 });
+
+test('Ensure table modifiers are not stacked out of context', function (int $iter) {
+    static $identifier = "test-table-stack";
+    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) use ($iter) {
+        $tableBuilder->pushColumns([TextColumn::make("password_iter_{$iter}")]);
+    }, $iter);
+
+    $table = TableBuilder::process(table: Table::make(TableComponent::make()), identifier: $identifier);
+
+    $keys = array_keys($table->getColumns());
+    expect($keys)->toBe(["password_iter_{$iter}"]);
+})->with(range(0, 2));

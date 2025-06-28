@@ -6,28 +6,17 @@ use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Component as ColumnLayoutComponent;
 use Filament\Tables\Table;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
 
 class TableBuilder
 {
     /**
-     * @var array<string,array<int,list<callable(static):void>>>
+     * @deprecated Consider using {@see FilamentExtendable::processTable()} instead
+     * @see FilamentExtendable::processTable()
      */
-    private static array $modifiers = [];
-
     public static function process(Table $table, string $identifier): Table
     {
-        $builder = new static($table);
-
-        $sortedModifiers = static::$modifiers[$identifier] ?? [];
-        ksort($sortedModifiers);
-
-        foreach ($sortedModifiers as $priority => $modifiers) {
-            foreach ($modifiers as $modifier) {
-                $modifier($builder);
-            }
-        }
-
-        return $table;
+        return FilamentExtendable::processTable($table, $identifier);
     }
 
     /**
@@ -35,12 +24,13 @@ class TableBuilder
      * @param callable(static):void $callback
      * @param int $priority
      * @return void
+     *
+     * @deprecated Consider using {@see FilamentExtendable::addTableModifier()} instead.
+     * @see FilamentExtendable::addTableModifier()
      */
     public static function modifyTableUsing(string $identifier, callable $callback, int $priority = 0): void
     {
-        static::$modifiers[$identifier] ??= [];
-        static::$modifiers[$identifier][$priority] ??= [];
-        static::$modifiers[$identifier][$priority][] = $callback;
+        FilamentExtendable::addTableModifier($identifier, $callback, $priority);
     }
 
     /*  Per-table processing */

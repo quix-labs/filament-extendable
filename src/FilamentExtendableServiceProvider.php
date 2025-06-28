@@ -20,12 +20,16 @@ use QuixLabs\FilamentExtendable\Generators\ExtendableTableClassGenerator;
 
 class FilamentExtendableServiceProvider extends ServiceProvider
 {
-
     public function register(): void
     {
+        $this->registerRegistry();
         $this->registerFilamentGenerators();
     }
 
+    private function registerRegistry(): void
+    {
+        $this->app->scoped(FilamentExtendableManager::class);
+    }
 
     private function registerFilamentGenerators(): void
     {

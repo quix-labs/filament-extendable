@@ -8,28 +8,17 @@ use Filament\Schemas\Components\Component;
 use Filament\Schemas\Schema;
 use QuixLabs\FilamentExtendable\Enums\InsertPosition;
 use QuixLabs\FilamentExtendable\Exceptions\SchemaGroupNotFoundException;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
 
 class SchemaBuilder
 {
     /**
-     * @var array<string,array<int,list<callable(static):void>>>
+     * @deprecated Consider using {@see FilamentExtendable::processSchema()} instead
+     * @see FilamentExtendable::processSchema()
      */
-    private static array $modifiers = [];
-
     public static function process(Schema $schema, string $identifier): Schema
     {
-        $builder = new static($schema);
-
-        $sortedModifiers = static::$modifiers[$identifier] ?? [];
-        ksort($sortedModifiers);
-
-        foreach ($sortedModifiers as $priority => $modifiers) {
-            foreach ($modifiers as $modifier) {
-                $modifier($builder);
-            }
-        }
-
-        return $schema;
+        return FilamentExtendable::processSchema($schema, $identifier);
     }
 
     /**
@@ -37,12 +26,13 @@ class SchemaBuilder
      * @param callable(static):void $callback
      * @param int $priority
      * @return void
+     *
+     * @deprecated Consider using {@see FilamentExtendable::addSchemaModifier()} instead.
+     * @see FilamentExtendable::addSchemaModifier()
      */
     public static function modifySchemaUsing(string $identifier, callable $callback, int $priority = 0): void
     {
-        static::$modifiers[$identifier] ??= [];
-        static::$modifiers[$identifier][$priority] ??= [];
-        static::$modifiers[$identifier][$priority][] = $callback;
+        FilamentExtendable::addSchemaModifier($identifier, $callback, $priority);
     }
 
     /*  Per-schema processing */
