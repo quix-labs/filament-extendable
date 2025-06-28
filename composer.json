@@ -1,0 +1,37 @@
+{
+  "name": "quix-labs/filament-extendable",
+  "description": "Extend Filament's form, table and infolist builders dynamically using a modular and composable system.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "filament",
+    "laravel",
+    "extendable",
+    "modular"
+  ],
+  "homepage": "https://github.com/quix-labs/filament-extendable",
+  "authors": [
+    {
+      "name": "COLANT Alan",
+      "email": "contact@alancolant.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^11.28|^12.0",
+    "filament/filament": "^v4.0.0-beta"
+  },
+  "autoload": {
+    "psr-4": {
+      "QuixLabs\\FilamentExtendable\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "QuixLabs\\FilamentExtendable\\FilamentExtendableServiceProvider"
+      ]
+    }
+  }
+}
