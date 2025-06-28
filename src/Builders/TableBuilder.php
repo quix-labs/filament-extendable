@@ -9,13 +9,19 @@ use Filament\Tables\Table;
 
 class TableBuilder
 {
+    /**
+     * @var array<string,array<int,list<callable(static):void>>>
+     */
     private static array $modifiers = [];
 
     public static function process(Table $table, string $identifier): Table
     {
         $builder = new static($table);
 
-        foreach (static::$modifiers[$identifier] ?? [] as $priority => $modifiers) {
+        $sortedModifiers = static::$modifiers[$identifier] ?? [];
+        ksort($sortedModifiers);
+
+        foreach ($sortedModifiers as $priority => $modifiers) {
             foreach ($modifiers as $modifier) {
                 $modifier($builder);
             }
@@ -24,6 +30,12 @@ class TableBuilder
         return $table;
     }
 
+    /**
+     * @param string $identifier
+     * @param callable(static):void $callback
+     * @param int $priority
+     * @return void
+     */
     public static function modifyTableUsing(string $identifier, callable $callback, int $priority = 0): void
     {
         static::$modifiers[$identifier] ??= [];

@@ -3,25 +3,22 @@
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/quix-labs/filament-extendable.svg?style=flat-square)](https://packagist.org/packages/quix-labs/filament-extendable)
 [![Total Downloads](https://img.shields.io/packagist/dt/quix-labs/filament-extendable.svg?style=flat-square)](https://packagist.org/packages/quix-labs/filament-extendable)
 
-**Filament Extendable** is a powerful extension toolkit for [FilamentPHP](https://filamentphp.com/), designed to make
-your tables, infolists and forms highly composable, customizable, and dynamically extendable — without modifying core
-logic.
+**Filament Extendable** is a powerful extension toolkit for [FilamentPHP](https://filamentphp.com/), enabling highly
+composable and dynamic customization of tables, forms, and infolists — all without touching core logic.
 
-## Notes
+## 🚩 Important Notice
 
-> **This library is currently under active development.**
->
-> Features and APIs may change.
->
-> Contributions and feedback are welcome!
+> This library is under active development.
+> APIs and features may evolve.
+> Contributions and feedback are highly appreciated.
 
 ## Features
 
-- Register dynamic modifiers for **forms**, **tables**, and **infolists**
-- Inject components **before** or **after** existing ones
-- Remove specific components by name
-- Compatible with `filament:make-*` commands
-- Minimal impact on the native Filament lifecycle
+* Dynamic registration of modifiers for **forms**, **tables**, and **infolists**
+* Insert components **before** or **after** existing ones
+* Remove components by key
+* Full compatibility with `filament:make-*` commands
+* Minimal interference with native Filament lifecycle
 
 ## Requirements
 
@@ -35,85 +32,137 @@ logic.
 composer require quix-labs/filament-extendable
 ```
 
-## ⚙️ Usage
-
-### 1. Enable extensibility in your Resource
+If needed, register the service provider (usually auto-discovered):
 
 ```php
-use QuixLabs\LaravelHookSystem\Builders\TableBuilder;
-use QuixLabs\LaravelHookSystem\Builders\SchemaBuilder;
-
-class YourResource extends Resource
-{
+// config/app.php
+'providers' => [
     // ...
-    public static function form(Schema $schema): Schema
-    {
-        return SchemaBuilder::process($schema, 'user-form');
-    }
-    
-    public static function infolist(Schema $schema): Schema
-    {
-        return SchemaBuilder::process($schema, 'user-infolist');
-    }
-    
-    public static function table(Table $table): Table
-    {
-        return TableBuilder::process($table, 'user-table');
-    }
-    // ...
-}
+    QuixLabs\FilamentExtendable\FilamentExtendableServiceProvider::class,
+],
 ```
 
-### 2. Register a modifier
+## Usage
+
+### 1. Enable Extensibility in Your Resource
+
+Wrap your resource schema and tables with the builders:
 
 ```php
 use QuixLabs\FilamentExtendable\Builders\TableBuilder;
 use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
 
-class YourProvider extends ServiceProvider {
-    // ...
+class UserResource extends Resource
+{
+    public static function form(Schema $schema): Schema
+    {
+        return SchemaBuilder::process($schema, 'user-form');
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return SchemaBuilder::process($schema, 'user-infolist');
+    }
+
+    public static function table(Table $table): Table
+    {
+        return TableBuilder::process($table, 'user-table');
+    }
+}
+```
+
+### 2. Register Modifiers
+
+Define dynamic modifiers in the `boot` function of your service provider:
+
+```php
+use QuixLabs\FilamentExtendable\Builders\TableBuilder;
+use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
+
+class FilamentExtendServiceProvider extends ServiceProvider
+{
     public function boot(): void
     {
-        // Extend the table
-        TableBuilder::modifyTableUsing('user-table', function (TableBuilder $builder) {
-            $builder->insertAfter('email', [
-                TextColumn::make('Lastname')
+        // Insert a column after 'email' in the user table
+        TableBuilder::modifyTableUsing('user-table', function (TableBuilder $tableBuilder) {
+            $tableBuilder->insertAfter('email', [
+                TextColumn::make('lastname')->label('Last Name'),
             ]);
         });
-        
-        // Extend the infolist
-        SchemaBuilder::modifySchemaUsing('user-infolist', function (SchemaBuilder $builder) {
-            $builder->pushComponents([
-                TextEntry::make('Lastname')
-            ]);
-        });
-        
-        // Extend the form
-        SchemaBuilder::modifySchemaUsing('user-form', function (SchemaBuilder $builder) {
-            $builder->pushComponents([
-                TextInpu::make('Lastname')
+
+        // Add a field to the user infolist
+        SchemaBuilder::modifySchemaUsing('user-infolist', function (SchemaBuilder $schemaBuilder) {
+            $schemaBuilder->pushComponents([
+                TextEntry::make('lastname')->label('Last Name'),
             ]);
         });
     }
 }
 ```
 
-### 3. Using `Native Filament Make Commands`
+### 3. Schema Manipulations
 
-Filament Extendable comes with patched artisan commands to automatically generate extendable resource structures:
+#### Insert component in schema
+
+Push components at root or inside nested groups via dot notation:
+
+Control insertion with:
+
+* `position` — `'before'` or `'after'` relative to a target key
+* `targetKey` — component key near which to insert
+* `targetGroup` — dot notation path to nested group
+
+```php
+// Append at root level (default behavior)
+$schemaBuilder->pushComponents([
+    TextInput::make('nickname')->label('Nickname'),
+]);
+
+// After 'bio' at root level
+$schemaBuilder->pushComponents([
+    TextArea::make('additional_notes'),
+], position: InsertPosition::AFTER, targetKey: 'bio');
+
+// Before 'email' at root level
+$schemaBuilder->pushComponents([
+    Select::make('preferred_contact_method'),
+], position: InsertPosition::BEFORE, targetKey: 'email');
+
+// After 'last_login' in 'tabs.activity' nested tab/section/group/...
+$schemaBuilder->pushComponents([
+    TextEntry::make('last_login_ip')->label('Last Login IP'),
+], position: InsertPosition::AFTER, targetKey: 'last_login', targetGroup: 'tabs.activity');
+```
+
+#### Delete Components from Schema
+
+You can remove components from both the root level and nested groups using their keys.
+
+**If a specified key is not found, the operation is silently skipped (no error thrown).**
+
+```php
+$schemaBuilder->removeComponents([
+    'email', // Removes 'email' field from the root level
+    'tabs.seo.meta_title', // Dot notation is supported for nested paths.
+]);
+```
+
+## Integration with Filament Artisan Commands
+
+Filament Extendable patches the following commands to scaffold extendable resources automatically:
 
 ```bash
 php artisan make:filament-resource User
-php artisan make:filament-table    UserTable
-php artisan make:filament-form     UserForm
-php artisan make:filament-schema   UserSchema
+php artisan make:filament-table UserTable
+php artisan make:filament-form UserForm
+php artisan make:filament-schema UserSchema
 ```
 
-These commands will:
-
-* Scaffold the resource or schema file
-* Add the appropriate call to `SchemaBuilder::process()` or `TableBuilder::process()`
-* Pre-configure the identifier used for hook registration
+They generate boilerplate code that includes calls to `SchemaBuilder::process()` and `TableBuilder::process()`, ready
+for modifier registration.
 
 > 💡 This allows you to plug in modifiers immediately, without writing boilerplate.
 

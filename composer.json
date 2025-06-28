@@ -1,37 +1,64 @@
 {
-  "name": "quix-labs/filament-extendable",
-  "description": "Extend Filament's form, table and infolist builders dynamically using a modular and composable system.",
-  "type": "library",
-  "license": "MIT",
-  "keywords": [
-    "filament",
-    "laravel",
-    "extendable",
-    "modular"
-  ],
-  "homepage": "https://github.com/quix-labs/filament-extendable",
-  "authors": [
-    {
-      "name": "COLANT Alan",
-      "email": "contact@alancolant.com",
-      "role": "Developer"
-    }
-  ],
-  "require": {
-    "php": "^8.2",
-    "illuminate/support": "^11.28|^12.0",
-    "filament/filament": "^v4.0.0-beta"
-  },
-  "autoload": {
-    "psr-4": {
-      "QuixLabs\\FilamentExtendable\\": "src/"
-    }
-  },
-  "extra": {
-    "laravel": {
-      "providers": [
-        "QuixLabs\\FilamentExtendable\\FilamentExtendableServiceProvider"
-      ]
-    }
-  }
+    "name": "quix-labs/filament-extendable",
+    "description": "Extend Filament's form, table and infolist builders dynamically using a modular and composable system.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "filament",
+        "laravel",
+        "extendable",
+        "modular"
+    ],
+    "homepage": "https://github.com/quix-labs/filament-extendable",
+    "authors": [
+        {
+            "name": "COLANT Alan",
+            "email": "contact@alancolant.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.28|^12.0",
+        "filament/filament": "^v4.0.0-beta"
+    },
+    "require-dev": {
+        "nunomaduro/collision": "^8.1.1||^7.10.0",
+        "orchestra/testbench": "^10.0.0||^9.0.0||^8.22.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-arch": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "QuixLabs\\FilamentExtendable\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "QuixLabs\\FilamentExtendable\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": "@composer run prepare",
+        "prepare": "@php vendor/bin/testbench package:discover --ansi",
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "QuixLabs\\FilamentExtendable\\FilamentExtendableServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
