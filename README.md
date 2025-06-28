@@ -7,8 +7,6 @@
 your tables, infolists and forms highly composable, customizable, and dynamically extendable — without modifying core
 logic.
 
----
-
 ## Notes
 
 > **This library is currently under active development.**
@@ -25,23 +23,17 @@ logic.
 - Compatible with `filament:make-*` commands
 - Minimal impact on the native Filament lifecycle
 
-___
-
 ## Requirements
 
 - PHP `^8.2`
 - Laravel `^11.x || ^12.x`
 - Filament `^4.0`
 
----
-
 ## 📦 Installation
 
 ```bash
 composer require quix-labs/filament-extendable
 ```
-
----
 
 ## ⚙️ Usage
 
@@ -125,10 +117,6 @@ These commands will:
 
 > 💡 This allows you to plug in modifiers immediately, without writing boilerplate.
 
-
-
----
-
 ## Why this exists
 
 Filament is an exceptional tool, but there are scenarios where additional dynamic control is needed:
@@ -139,13 +127,9 @@ Filament is an exceptional tool, but there are scenarios where additional dynami
 
 **Filament Extendable** solves this with a non-intrusive, declarative API.
 
----
-
 ## Changelog
 
 Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
----
 
 ## 🤝 Contributing
 
