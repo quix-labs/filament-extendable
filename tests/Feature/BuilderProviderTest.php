@@ -94,7 +94,7 @@ test('Ensure table modifiers are executed in order', function (): void {
 
 test('Ensure table modifiers are not stacked out of context', function (int $iter): void {
     static $identifier = "test-table-stack";
-    FilamentExtendable::addTableModifier($identifier, function (TableBuilder $tableBuilder) use ($iter) {
+    FilamentExtendable::addTableModifier($identifier, function (TableBuilder $tableBuilder) use ($iter): void {
         $tableBuilder->pushColumns([TextColumn::make("password_iter_{$iter}")]);
     }, $iter);
 
