@@ -1,15 +1,12 @@
-name: Rector CI
+name: Rector
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - '*'
   workflow_dispatch:
     branches:
-      - dev
+      - '*'
 
 jobs:
   rector:
@@ -48,6 +45,11 @@ jobs:
         run: |
           vendor/bin/rector process --ansi
 
-      - name: Validate Rector changes
-        run: |
-          git diff --exit-code
+      - uses: EndBug/add-and-commit@v5.1.0
+        with:
+          add: .
+          message: "[ci-review] Rector Rectify"
+          author_name: "GitHub Action"
+          author_email: "action+rector@github.com"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
