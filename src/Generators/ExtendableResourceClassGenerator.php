@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace QuixLabs\FilamentExtendable\Generators;
 
-use RuntimeException;
 use Filament\Commands\FileGenerators\Resources\ResourceClassGenerator;
 use Nette\PhpGenerator\Method;
-use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
-use QuixLabs\FilamentExtendable\Builders\TableBuilder;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
+use RuntimeException;
 
 class ExtendableResourceClassGenerator extends ResourceClassGenerator
 {
@@ -17,7 +16,7 @@ class ExtendableResourceClassGenerator extends ResourceClassGenerator
         if (!$this->isSimple()) {
             return parent::getImports();
         }
-        return array_merge(parent::getImports(), [SchemaBuilder::class, TableBuilder::class]);
+        return array_merge(parent::getImports(), [FilamentExtendable::class]);
     }
 
     protected function configureInfolistMethod(Method $method): void
@@ -55,7 +54,7 @@ class ExtendableResourceClassGenerator extends ResourceClassGenerator
             throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return SchemaBuilder::process({$schemaContent}, {$identifier});");
+        $method->setBody("return FilamentExtendable::processSchema({$schemaContent}, {$identifier});");
     }
 
     protected function injectTableBuilderInMethodBody(Method $method, string $identifier = "static::class"): void
@@ -69,6 +68,6 @@ class ExtendableResourceClassGenerator extends ResourceClassGenerator
             throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return TableBuilder::process({$tableContent}, {$identifier});");
+        $method->setBody("return FilamentExtendable::processTable({$tableContent}, {$identifier});");
     }
 }

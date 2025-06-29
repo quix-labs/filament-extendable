@@ -50,24 +50,23 @@ If needed, register the service provider (usually auto-discovered):
 Wrap your resource schema and tables with the builders:
 
 ```php
-use QuixLabs\FilamentExtendable\Builders\TableBuilder;
-use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
 
 class UserResource extends Resource
 {
     public static function form(Schema $schema): Schema
     {
-        return SchemaBuilder::process($schema, 'user-form');
+        return FilamentExtendable::processSchema($schema, 'user-form');
     }
 
     public static function infolist(Schema $schema): Schema
     {
-        return SchemaBuilder::process($schema, 'user-infolist');
+        return FilamentExtendable::processSchema($schema, 'user-infolist');
     }
 
     public static function table(Table $table): Table
     {
-        return TableBuilder::process($table, 'user-table');
+        return FilamentExtendable::processTable($table, 'user-table');
     }
 }
 ```
@@ -79,6 +78,7 @@ Define dynamic modifiers in the `boot` function of your service provider:
 ```php
 use QuixLabs\FilamentExtendable\Builders\TableBuilder;
 use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
@@ -88,14 +88,14 @@ class FilamentExtendServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Insert a column after 'email' in the user table
-        TableBuilder::modifyTableUsing('user-table', function (TableBuilder $tableBuilder) {
+        FilamentExtendable::addTableModifier('user-table', function (TableBuilder $tableBuilder) {
             $tableBuilder->insertAfter('email', [
                 TextColumn::make('lastname')->label('Last Name'),
             ]);
         });
 
         // Add a field to the user infolist
-        SchemaBuilder::modifySchemaUsing('user-infolist', function (SchemaBuilder $schemaBuilder) {
+        FilamentExtendable::addSchemaModifier('user-infolist', function (SchemaBuilder $schemaBuilder) {
             $schemaBuilder->pushComponents([
                 TextEntry::make('lastname')->label('Last Name'),
             ]);
@@ -162,7 +162,8 @@ php artisan make:filament-form UserForm
 php artisan make:filament-schema UserSchema
 ```
 
-They generate boilerplate code that includes calls to `SchemaBuilder::process()` and `TableBuilder::process()`, ready
+They generate boilerplate code that includes calls to `FilamentExtendable::processSchema()`
+and `FilamentExtendable::processTable()`, ready
 for modifier registration.
 
 > 💡 This allows you to plug in modifiers immediately, without writing boilerplate.

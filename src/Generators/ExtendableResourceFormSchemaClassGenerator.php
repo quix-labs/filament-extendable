@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace QuixLabs\FilamentExtendable\Generators;
 
-use RuntimeException;
 use Filament\Commands\FileGenerators\Resources\Schemas\ResourceFormSchemaClassGenerator;
 use Nette\PhpGenerator\Method;
-use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
+use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
+use RuntimeException;
 
 class ExtendableResourceFormSchemaClassGenerator extends ResourceFormSchemaClassGenerator
 {
     public function getImports(): array
     {
-        return array_merge(parent::getImports(), [SchemaBuilder::class]);
+        return array_merge(parent::getImports(), [FilamentExtendable::class]);
     }
 
     protected function configureConfigureMethod(Method $method): void
@@ -28,6 +28,6 @@ class ExtendableResourceFormSchemaClassGenerator extends ResourceFormSchemaClass
             throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return SchemaBuilder::process({$schemaContent}, static::class);");
+        $method->setBody("return FilamentExtendable::processSchema({$schemaContent}, static::class);");
     }
 }

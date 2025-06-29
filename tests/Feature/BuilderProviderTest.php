@@ -49,7 +49,7 @@ test('Ensure schema modifiers are executed in order', function (): void {
 
 test('Ensure schema modifiers are not stacked out of context', function (int $iter): void {
     static $identifier = "test-schema-stack";
-    FilamentExtendable::addSchemaModifier($identifier, function (SchemaBuilder $schemaBuilder) use ($iter): void {
+    FilamentExtendable::addSchemaModifier($identifier, function (SchemaBuilder $schemaBuilder) use ($iter) {
         $schemaBuilder->pushComponents([TextInput::make("password_iter_{$iter}")]);
     }, $iter);
 
