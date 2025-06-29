@@ -70,7 +70,7 @@ class TableBuilder
         }
 
         // Retrieve the target group component
-        $group = $this->table->getColumnGroups()[$targetGroup] ?? null;
+        $group = $this->table->getColumnGroup($targetGroup);
         if (!$group instanceof ColumnGroup) {
             throw new TableGroupNotFoundException($targetGroup);
         }
