@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Rector\CodingStyle\Rector\Encapsed\WrapEncapsedVariableInCurlyBracesRector;
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\LevelSetList;
+use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use RectorLaravel\Rector\Class_\AnonymousMigrationsRector;
 use RectorLaravel\Rector\Coalesce\ApplyDefaultInsteadOfNullCoalesceRector;
 use RectorLaravel\Rector\Expr\AppEnvironmentComparisonToParameterRector;
@@ -45,6 +47,8 @@ return RectorConfig::configure()
     )
     ->withPhpSets()
     ->withSets([
+        LevelSetList::UP_TO_PHP_84,
+
         LaravelSetList::LARAVEL_100,
         LaravelSetList::LARAVEL_CODE_QUALITY,
         LaravelSetList::LARAVEL_COLLECTION,
@@ -75,12 +79,16 @@ return RectorConfig::configure()
         ResponseHelperCallToJsonResponseRector::class,
         RouteActionCallableRector::class,
         SleepFuncToSleepStaticCallRector::class,
-        
+
         UseComponentPropertyWithinCommandsRector::class,
         ValidationRuleArrayStringValueToArrayRector::class,
     ])
+    ->withSkip([
+        DisallowedEmptyRuleFixerRector::class,  // We will continue to use empty(), as it is more readable than alternatives
+    ])
     ->withImportNames(
         removeUnusedImports: true
-    )->withAutoloadPaths([
+    )
+    ->withAutoloadPaths([
         __DIR__ . '/vendor/autoload.php'
     ]);

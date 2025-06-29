@@ -143,7 +143,7 @@ class SchemaBuilder
             $groupPath = count($tree) === 0 ? null : implode('.', $tree);
 
             // Return root or section/grid/tab/... when needed
-            $parent = $groupPath !== null && $groupPath !== '' && $groupPath !== '0' ? $this->schema->getComponent(implode('.', $tree)) : $this->schema;
+            $parent = empty($groupPath) ? $this->schema : $this->schema->getComponent(implode('.', $tree));
             if (!$parent) {
                 continue;
             }
