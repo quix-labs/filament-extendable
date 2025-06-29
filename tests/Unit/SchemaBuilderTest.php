@@ -31,18 +31,6 @@ test('can push component at the start of root', function (): void {
     $keys = array_keys($this->schema->getFlatComponents());
     expect($keys)->toBe(['name', 'email']);
 });
-test('can push component when target component not exists', function (): void {
-    $this->schema->components([TextInput::make('name')]);
-    $this->builder->pushComponents(
-        [TextInput::make('name_before')], InsertPosition::BEFORE, targetKey: "missing"
-    );
-    $this->builder->pushComponents(
-        [TextInput::make('name_after')], InsertPosition::AFTER, targetKey: "missing"
-    );
-
-    $keys = array_keys($this->schema->getFlatComponents());
-    expect($keys)->toBe(['name_before', 'name', 'name_after']);
-});
 
 test('can insert before a specific component at root', function (): void {
     $this->schema->components([
@@ -74,6 +62,19 @@ test('can insert after a specific component at root', function (): void {
 
     $keys = array_keys($this->schema->getFlatComponents());
     expect($keys)->toBe(['email', 'middlename', 'lastname']);
+});
+
+test('can push component when target component not exists', function (): void {
+    $this->schema->components([TextInput::make('name')]);
+    $this->builder->pushComponents(
+        [TextInput::make('name_before')], InsertPosition::BEFORE, targetKey: "missing"
+    );
+    $this->builder->pushComponents(
+        [TextInput::make('name_after')], InsertPosition::AFTER, targetKey: "missing"
+    );
+
+    $keys = array_keys($this->schema->getFlatComponents());
+    expect($keys)->toBe(['name_before', 'name', 'name_after']);
 });
 
 test('can insert into nested group specific component', function (): void {

@@ -8,6 +8,8 @@ use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\ColumnGroup;
 use Filament\Tables\Columns\Layout\Component as ColumnLayoutComponent;
 use Filament\Tables\Table;
+use QuixLabs\FilamentExtendable\Enums\InsertPosition;
+use QuixLabs\FilamentExtendable\Exceptions\TableGroupNotFoundException;
 use QuixLabs\FilamentExtendable\Facades\FilamentExtendable;
 
 class TableBuilder
@@ -38,80 +40,117 @@ class TableBuilder
     }
 
     /**
-     * Push columns to the end of the column list.
+     * Push columns into the table or a specific group identified by label.
      *
-     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $components
+     * If $targetGroup is provided, inserts the components into that group.
+     * If $targetKey is provided, inserts components before or after that component within the group/root.
+     * If $targetKey is null, inserts at the start ('before') or end ('after') of the group/root.
+     *
+     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $columns Columns to insert
+     * @param InsertPosition $position Position relative to $targetKey or at start/end if $targetKey is null
+     * @param string|null $targetKey Key of the column relative to which insertion is done
+     * @param string|null $targetGroup Target group label
+     * @throws TableGroupNotFoundException
      */
-    public function pushColumns(array $components): static
+    public function pushColumns(
+        array          $columns,
+        InsertPosition $position = InsertPosition::AFTER,
+        ?string        $targetKey = null,
+        ?string        $targetGroup = null,
+
+    ): void
     {
-        $this->table->pushColumns($components);
-        return $this;
+        $layout = $this->table->getColumnsLayout();
+
+        // If no target group specified, insert at root level and update schema
+        if ($targetGroup === null) {
+            $updated = $this->insertAt($layout, $columns, $position, $targetKey);
+            $this->table->columns($updated);
+            return;
+        }
+
+        // Retrieve the target group component
+        $group = $this->table->getColumnGroup($targetGroup);
+        if (!$group instanceof ColumnGroup) {
+            throw new TableGroupNotFoundException($targetGroup);
+        }
+
+        // Insert columns into the target group's children directly
+        $groupColumns = $group->getColumns();
+        $updatedGroupColumns = $this->insertAt($groupColumns, $columns, $position, $targetKey);
+        $group->columns($updatedGroupColumns);
+
+        $this->table->columns($layout);
     }
 
     /**
-     * Insert components after a specific target column by name.
+     * Insert components at the given position relative to the target key.
      *
-     * @param string $targetName The name of the column to insert after.
-     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $components
+     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $columns Columns where to insert
+     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $toInsert Columns to insert
+     * @param InsertPosition $position Position relative to $targetKey
+     * @param string|null $targetKey Key to find the position
+     * @return array<Column | ColumnLayoutComponent | ColumnGroup> Updated columns list
      */
-    public function insertAfter(string $targetName, array $components): static
+    protected function insertAt(
+        array          $columns,
+        array          $toInsert,
+        InsertPosition $position,
+        ?string        $targetKey,
+    ): array
     {
-        $this->insertRelativeTo($targetName, $components, after: true);
-        return $this;
-    }
+        if ($targetKey === null) {
+            return match ($position) {
+                InsertPosition::BEFORE => array_merge($toInsert, $columns),
+                InsertPosition::AFTER => array_merge($columns, $toInsert),
+            };
+        }
 
-    /**
-     * Insert components before a specific target column by name.
-     *
-     * @param string $targetName The name of the column to insert before.
-     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $components
-     */
-    public function insertBefore(string $targetName, array $components): static
-    {
-        $this->insertRelativeTo($targetName, $components, after: false);
-        return $this;
-    }
+        foreach (array_values($columns) as $index => $column) {
+            // Case: nested layout (e.g., Stack, Grid, etc.)
+            if ($column instanceof ColumnLayoutComponent) {
+                $updated = $this->insertAt($column->getComponents(), $toInsert, $position, $targetKey);
+                $column->components($updated);
+                return $columns;
+            }
 
-
-    /**
-     * Internal logic to insert before or after a column by name in the top-level columns array.
-     */
-    protected function insertRelativeTo(string $targetName, array $components, bool $after = true): void
-    {
-        $columns = $this->table->getColumns();
-        $this->table->columns(
-            $this->insertIntoArrayByName($columns, $targetName, $components, $after)
-        );
-    }
-
-    /**
-     * Helper method to insert components into an array before or after a target item by its name.
-     *
-     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $original
-     * @param array<Column | ColumnLayoutComponent | ColumnGroup> $components
-     */
-    protected function insertIntoArrayByName(array $original, string $targetName, array $components, bool $after): array
-    {
-        $result = [];
-        $matched = false;
-
-        foreach ($original as $column) {
-            if ($column->getName() === $targetName) {
-                $matched = true;
-                if (!$after) {
-                    $result = array_merge($result, $components);
-                }
-
-                $result[] = $column;
-
-                if ($after) {
-                    $result = array_merge($result, $components);
-                }
-            } else {
-                $result[] = $column;
+            // Case: flat column
+            if ($column instanceof Column && $column->getName() === $targetKey) {
+                return match ($position) {
+                    InsertPosition::BEFORE => array_merge(
+                        array_slice($columns, 0, $index, true),
+                        $toInsert,
+                        array_slice($columns, $index, null, true),
+                    ),
+                    InsertPosition::AFTER => array_merge(
+                        array_slice($columns, 0, $index + 1, true),
+                        $toInsert,
+                        array_slice($columns, $index + 1, null, true),
+                    ),
+                };
             }
         }
 
-        return $matched ? $result : array_merge($original, $components);
+        // If target key is not found, fallback to append/prepend
+        return match ($position) {
+            InsertPosition::BEFORE => array_merge($toInsert, $columns),
+            InsertPosition::AFTER => array_merge($columns, $toInsert),
+        };
+    }
+
+    /**
+     * Remove columns from the table.
+     *
+     * @param string[] $keys Keys of the columns to remove
+     */
+    public function removeColumns(array $keys): void
+    {
+        $columns = $this->table->getColumns();
+        foreach ($keys as $key) {
+            if (isset($columns[$key])) {
+                unset($columns[$key]);
+            }
+        }
+        $this->table->columns($columns);
     }
 }

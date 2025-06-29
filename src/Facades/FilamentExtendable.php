@@ -10,13 +10,15 @@ use Illuminate\Support\Facades\Facade;
 use QuixLabs\FilamentExtendable\FilamentExtendableManager;
 
 /**
- * @method static void addSchemaModifier(string $identifier, callable $callback, int $priority = 0) Callables of type: function(SchemaBuilder): void
- * @method static void addTableModifier(string $identifier, callable $callback, int $priority = 0) Callables of type: function(TableBuilder): void
+ * @method static FilamentExtendableManager addSchemaModifier(string $identifier, callable $callback, int $priority = 0) Callables of type: function(SchemaBuilder): void
+ * @method static FilamentExtendableManager addTableModifier(string $identifier, callable $callback, int $priority = 0) Callables of type: function(TableBuilder): void
  * @method static callable[] getSchemaModifiers(string $identifier, bool $sorted = true) Callables of type: function(SchemaBuilder): void
  * @method static callable[] getTableModifiers(string $identifier, bool $sorted = true) Callables of type: function(TableBuilder): void
  * @method static Schema processSchema(Schema $schema, string $identifier)
  * @method static Table processTable(Table $table, string $identifier)
  * @method static void flush()
+ *
+ * @method static FilamentExtendableManager getFacadeRoot()
  *
  * @see \QuixLabs\FilamentExtendable\FilamentExtendableManager
  */

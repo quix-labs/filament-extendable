@@ -71,8 +71,9 @@ class SchemaBuilder
 
         // Retrieve the nested target group component
         $targetComponent = $this->schema->getComponent($targetGroup);
-
-        throw_if($targetComponent === null, SchemaGroupNotFoundException::class, $targetGroup);
+        if ($targetComponent === null) {
+            throw new SchemaGroupNotFoundException($targetGroup);
+        }
 
         // Insert components into the target group's children directly
         $childComponents = $targetComponent->getChildComponents();
@@ -100,14 +101,20 @@ class SchemaBuilder
             };
         }
 
-        foreach ($components as $index => $component) {
+        foreach (array_values($components) as $index => $component) {
             if ($component->getKey(false) === $targetKey) {
-                if ($position === InsertPosition::BEFORE) {
-                    array_splice($components, $index, 0, $toInsert);
-                } elseif ($position === InsertPosition::AFTER) {
-                    array_splice($components, $index + 1, 0, $toInsert);
-                }
-                return $components;
+                return match ($position) {
+                    InsertPosition::BEFORE => array_merge(
+                        array_slice($components, 0, $index, true),
+                        $toInsert,
+                        array_slice($components, $index, null, true),
+                    ),
+                    InsertPosition::AFTER => array_merge(
+                        array_slice($components, 0, $index + 1, true),
+                        $toInsert,
+                        array_slice($components, $index + 1, null, true),
+                    ),
+                };
             }
         }
 

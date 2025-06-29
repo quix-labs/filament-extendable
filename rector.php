@@ -11,9 +11,7 @@ use RectorLaravel\Rector\FuncCall\FactoryFuncCallToStaticCallRector;
 use RectorLaravel\Rector\FuncCall\NowFuncWithStartOfDayMethodCallToTodayFuncRector;
 use RectorLaravel\Rector\FuncCall\RemoveDumpDataDeadCodeRector;
 use RectorLaravel\Rector\FuncCall\SleepFuncToSleepStaticCallRector;
-use RectorLaravel\Rector\FuncCall\ThrowIfAndThrowUnlessExceptionsToUseClassStringRector;
 use RectorLaravel\Rector\If_\ReportIfRector;
-use RectorLaravel\Rector\If_\ThrowIfRector;
 use RectorLaravel\Rector\MethodCall\AssertStatusToAssertMethodRector;
 use RectorLaravel\Rector\MethodCall\EloquentOrderByToLatestOrOldestRector;
 use RectorLaravel\Rector\MethodCall\EloquentWhereRelationTypeHintingParameterRector;
@@ -77,8 +75,7 @@ return RectorConfig::configure()
         ResponseHelperCallToJsonResponseRector::class,
         RouteActionCallableRector::class,
         SleepFuncToSleepStaticCallRector::class,
-        ThrowIfAndThrowUnlessExceptionsToUseClassStringRector::class,
-        ThrowIfRector::class,
+        
         UseComponentPropertyWithinCommandsRector::class,
         ValidationRuleArrayStringValueToArrayRector::class,
     ])

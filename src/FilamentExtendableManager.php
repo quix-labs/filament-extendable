@@ -24,21 +24,24 @@ class FilamentExtendableManager
     /**
      * @param callable(SchemaBuilder):void $callback
      */
-    public function addSchemaModifier(string $identifier, callable $callback, int $priority = 0): void
+    public function addSchemaModifier(string $identifier, callable $callback, int $priority = 0): self
     {
         $this->schemaModifiers[$identifier] ??= [];
         $this->schemaModifiers[$identifier][$priority] ??= [];
         $this->schemaModifiers[$identifier][$priority][] = $callback;
+
+        return $this;
     }
 
     /**
      * @param callable(TableBuilder):void $callback
      */
-    public function addTableModifier(string $identifier, callable $callback, int $priority = 0): void
+    public function addTableModifier(string $identifier, callable $callback, int $priority = 0): self
     {
         $this->tableModifiers[$identifier] ??= [];
         $this->tableModifiers[$identifier][$priority] ??= [];
         $this->tableModifiers[$identifier][$priority][] = $callback;
+        return $this;
     }
 
     /**
