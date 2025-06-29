@@ -89,6 +89,6 @@ return RectorConfig::configure()
     ->withImportNames(
         removeUnusedImports: true
     )
-    ->withAutoloadPaths([
-        __DIR__ . '/vendor/autoload.php'
-    ]);
+    ->withCache(
+        __DIR__ . '/.rector.cache'
+    );

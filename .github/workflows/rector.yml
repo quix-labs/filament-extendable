@@ -37,7 +37,7 @@ jobs:
       - name: Cache Rector cache
         uses: actions/cache@v3
         with:
-          path: storage/rector
+          path: .rector.cache
           key: ${{ runner.os }}-rector-${{ hashFiles('**/rector.php') }}
           restore-keys: ${{ runner.os }}-rector-
 
