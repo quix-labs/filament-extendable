@@ -57,8 +57,7 @@ class TableBuilder
         InsertPosition $position = InsertPosition::AFTER,
         ?string        $targetKey = null,
         ?string        $targetGroup = null,
-
-    ): void
+    ): self
     {
         $layout = $this->table->getColumnsLayout();
 
@@ -66,7 +65,7 @@ class TableBuilder
         if ($targetGroup === null) {
             $updated = $this->insertAt($layout, $columns, $position, $targetKey);
             $this->table->columns($updated);
-            return;
+            return $this;
         }
 
         // Retrieve the target group component
@@ -81,6 +80,8 @@ class TableBuilder
         $group->columns($updatedGroupColumns);
 
         $this->table->columns($layout);
+
+        return $this;
     }
 
     /**
@@ -143,7 +144,7 @@ class TableBuilder
      *
      * @param string[] $keys Keys of the columns to remove
      */
-    public function removeColumns(array $keys): void
+    public function removeColumns(array $keys): self
     {
         $columns = $this->table->getColumns();
         foreach ($keys as $key) {
@@ -152,5 +153,7 @@ class TableBuilder
             }
         }
         $this->table->columns($columns);
+
+        return $this;
     }
 }

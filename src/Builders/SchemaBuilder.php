@@ -57,7 +57,7 @@ class SchemaBuilder
         InsertPosition $position = InsertPosition::AFTER,
         ?string        $targetKey = null,
         ?string        $targetGroup = null
-    ): void
+    ): self
     {
         // Get root components
         $rootComponents = $this->schema->getComponents(withHidden: true);
@@ -66,7 +66,7 @@ class SchemaBuilder
         if ($targetGroup === null) {
             $updated = $this->insertAt($rootComponents, $components, $position, $targetKey);
             $this->schema->components($updated);
-            return;
+            return $this;
         }
 
         // Retrieve the nested target group component
@@ -81,6 +81,8 @@ class SchemaBuilder
 
         // Set updated children back into the target component (modifies by reference)
         $targetComponent->components($updatedChildren);
+
+        return $this;
     }
 
     /**
@@ -133,7 +135,7 @@ class SchemaBuilder
      *
      * @param string[] $keys Keys of the components to remove
      */
-    public function removeComponents(array $keys): void
+    public function removeComponents(array $keys): self
     {
         foreach ($keys as $fullKey) {
             $tree = explode('.', $fullKey);
@@ -159,5 +161,7 @@ class SchemaBuilder
                 }
             }
         }
+
+        return $this;
     }
 }
