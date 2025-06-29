@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Builders;
 
 use Filament\Tables\Columns\Column;
@@ -20,10 +22,7 @@ class TableBuilder
     }
 
     /**
-     * @param string $identifier
      * @param callable(static):void $callback
-     * @param int $priority
-     * @return void
      *
      * @deprecated Consider using {@see FilamentExtendable::addTableModifier()} instead.
      * @see FilamentExtendable::addTableModifier()
@@ -89,10 +88,7 @@ class TableBuilder
      * Helper method to insert components into an array before or after a target item by its name.
      *
      * @param array<Column | ColumnLayoutComponent | ColumnGroup> $original
-     * @param string $targetName
      * @param array<Column | ColumnLayoutComponent | ColumnGroup> $components
-     * @param bool $after
-     * @return array
      */
     protected function insertIntoArrayByName(array $original, string $targetName, array $components, bool $after): array
     {

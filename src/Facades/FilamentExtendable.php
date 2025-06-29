@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Facades;
 
 use Filament\Schemas\Schema;

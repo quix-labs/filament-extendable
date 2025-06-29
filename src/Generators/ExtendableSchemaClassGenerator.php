@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Generators;
 
+use RuntimeException;
 use Filament\Schemas\Commands\FileGenerators\SchemaClassGenerator;
 use Nette\PhpGenerator\Method;
 use QuixLabs\FilamentExtendable\Builders\SchemaBuilder;
@@ -22,9 +25,9 @@ class ExtendableSchemaClassGenerator extends SchemaClassGenerator
         if (preg_match('/return\s+(.*?);?\s*$/s', trim($initialReturn), $matches)) {
             $schemaContent = $matches[1];
         } else {
-            throw new \RuntimeException("Failed to extract return expression from parent method body.");
+            throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return SchemaBuilder::process($schemaContent, static::class);");
+        $method->setBody("return SchemaBuilder::process({$schemaContent}, static::class);");
     }
 }

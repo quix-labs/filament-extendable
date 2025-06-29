@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -9,9 +11,9 @@ use QuixLabs\FilamentExtendable\Builders\TableBuilder;
 use QuixLabs\FilamentExtendable\Tests\Fixtures\SchemaComponent;
 use QuixLabs\FilamentExtendable\Tests\Fixtures\TableComponent;
 
-test('Ensure schema can be extended at runtime', function () {
+test('Ensure schema can be extended at runtime', function (): void {
     static $identifier = "test-schema";
-    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) {
+    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder): void {
         $schemaBuilder->pushComponents([TextInput::make('password')]);
     });
 
@@ -24,14 +26,14 @@ test('Ensure schema can be extended at runtime', function () {
     expect($keys)->toBe(['name', 'password']);
 });
 
-test('Ensure schema modifiers are executed in order', function () {
+test('Ensure schema modifiers are executed in order', function (): void {
     static $identifier = "test-schema-order";
 
-    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) {
+    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder): void {
         $schemaBuilder->pushComponents([TextInput::make('password_20')]);
     }, 20);
 
-    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) {
+    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder): void {
         $schemaBuilder->pushComponents([TextInput::make('password_10')]);
     }, 10);
 
@@ -44,9 +46,9 @@ test('Ensure schema modifiers are executed in order', function () {
     expect($keys)->toBe(['name', 'password_10', 'password_20']);
 });
 
-test('Ensure schema modifiers are not stacked out of context', function (int $iter) {
+test('Ensure schema modifiers are not stacked out of context', function (int $iter): void {
     static $identifier = "test-schema-stack";
-    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) use ($iter) {
+    SchemaBuilder::modifySchemaUsing($identifier, function (SchemaBuilder $schemaBuilder) use ($iter): void {
         $schemaBuilder->pushComponents([TextInput::make("password_iter_{$iter}")]);
     }, $iter);
 
@@ -56,9 +58,9 @@ test('Ensure schema modifiers are not stacked out of context', function (int $it
     expect($keys)->toBe(["password_iter_{$iter}"]);
 })->with(range(0, 2));
 
-test('Ensure table can be extended at runtime', function () {
+test('Ensure table can be extended at runtime', function (): void {
     static $identifier = "test-table";
-    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) {
+    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder): void {
         $tableBuilder->pushColumns([TextColumn::make('password')]);
     });
 
@@ -71,12 +73,12 @@ test('Ensure table can be extended at runtime', function () {
     expect($keys)->toBe(['name', 'password']);
 });
 
-test('Ensure table modifiers are executed in order', function () {
+test('Ensure table modifiers are executed in order', function (): void {
     static $identifier = "test-table";
-    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) {
+    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder): void {
         $tableBuilder->pushColumns([TextColumn::make('password_20')]);
     }, 20);
-    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) {
+    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder): void {
         $tableBuilder->pushColumns([TextColumn::make('password_10')]);
     }, 10);
 
@@ -89,9 +91,9 @@ test('Ensure table modifiers are executed in order', function () {
     expect($keys)->toBe(['name', 'password_10', 'password_20']);
 });
 
-test('Ensure table modifiers are not stacked out of context', function (int $iter) {
+test('Ensure table modifiers are not stacked out of context', function (int $iter): void {
     static $identifier = "test-table-stack";
-    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) use ($iter) {
+    TableBuilder::modifyTableUsing($identifier, function (TableBuilder $tableBuilder) use ($iter): void {
         $tableBuilder->pushColumns([TextColumn::make("password_iter_{$iter}")]);
     }, $iter);
 

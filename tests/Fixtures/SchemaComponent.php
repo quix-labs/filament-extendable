@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Tests\Fixtures;
 
 use Filament\Schemas\Concerns\InteractsWithSchemas;

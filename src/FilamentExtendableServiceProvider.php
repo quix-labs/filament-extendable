@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable;
 
 use Filament\Commands\FileGenerators\Resources\ResourceClassGenerator;

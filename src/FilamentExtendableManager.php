@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable;
 
 use Filament\Schemas\Schema;
@@ -20,10 +22,7 @@ class FilamentExtendableManager
     private array $tableModifiers = [];
 
     /**
-     * @param string $identifier
      * @param callable(SchemaBuilder):void $callback
-     * @param int $priority
-     * @return void
      */
     public function addSchemaModifier(string $identifier, callable $callback, int $priority = 0): void
     {
@@ -33,10 +32,7 @@ class FilamentExtendableManager
     }
 
     /**
-     * @param string $identifier
      * @param callable(TableBuilder):void $callback
-     * @param int $priority
-     * @return void
      */
     public function addTableModifier(string $identifier, callable $callback, int $priority = 0): void
     {
@@ -46,8 +42,6 @@ class FilamentExtendableManager
     }
 
     /**
-     * @param string $identifier
-     * @param bool $sorted
      * @return array<callable(SchemaBuilder): void>
      */
     public function getSchemaModifiers(string $identifier, bool $sorted = true): array
@@ -61,8 +55,6 @@ class FilamentExtendableManager
     }
 
     /**
-     * @param string $identifier
-     * @param bool $sorted
      * @return array<callable(TableBuilder): void>
      */
     public function getTableModifiers(string $identifier, bool $sorted = true): array
@@ -95,8 +87,6 @@ class FilamentExtendableManager
 
     /**
      * Clear all registered modifiers
-     *
-     * @return void
      */
     public function flush(): void
     {

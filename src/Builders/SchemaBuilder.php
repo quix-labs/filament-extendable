@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Builders;
 
 use Filament\Actions\Action;
@@ -22,10 +24,7 @@ class SchemaBuilder
     }
 
     /**
-     * @param string $identifier
      * @param callable(static):void $callback
-     * @param int $priority
-     * @return void
      *
      * @deprecated Consider using {@see FilamentExtendable::addSchemaModifier()} instead.
      * @see FilamentExtendable::addSchemaModifier()
@@ -73,9 +72,7 @@ class SchemaBuilder
         // Retrieve the nested target group component
         $targetComponent = $this->schema->getComponent($targetGroup);
 
-        if ($targetComponent === null) {
-            throw new SchemaGroupNotFoundException($targetGroup);
-        }
+        throw_if($targetComponent === null, SchemaGroupNotFoundException::class, $targetGroup);
 
         // Insert components into the target group's children directly
         $childComponents = $targetComponent->getChildComponents();
@@ -128,17 +125,16 @@ class SchemaBuilder
      * Dot notation is supported for nested group paths (e.g. "tabs.seo.meta_title").
      *
      * @param string[] $keys Keys of the components to remove
-     * @return void
      */
     public function removeComponents(array $keys): void
     {
         foreach ($keys as $fullKey) {
             $tree = explode('.', $fullKey);
             $fieldKey = array_pop($tree);
-            $groupPath = implode('.', $tree);
+            $groupPath = count($tree) === 0 ? null : implode('.', $tree);
 
             // Return root or section/grid/tab/... when needed
-            $parent = !empty($groupPath) ? $this->schema->getComponent(implode('.', $tree)) : $this->schema;
+            $parent = $groupPath !== null && $groupPath !== '' && $groupPath !== '0' ? $this->schema->getComponent(implode('.', $tree)) : $this->schema;
             if (!$parent) {
                 continue;
             }

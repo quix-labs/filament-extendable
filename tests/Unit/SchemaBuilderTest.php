@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Schema;
@@ -9,12 +11,12 @@ use QuixLabs\FilamentExtendable\Exceptions\SchemaGroupNotFoundException;
 use QuixLabs\FilamentExtendable\Tests\Fixtures\SchemaComponent;
 
 
-beforeEach(function () {
+beforeEach(function (): void {
     $this->schema = Schema::make(SchemaComponent::make());
     $this->builder = new SchemaBuilder($this->schema);
 });
 
-test('can push component at the end of root', function () {
+test('can push component at the end of root', function (): void {
     $this->schema->components([TextInput::make('email')]);
     $this->builder->pushComponents([TextInput::make('name')]);
 
@@ -22,14 +24,14 @@ test('can push component at the end of root', function () {
     expect($keys)->toBe(['email', 'name']);
 });
 
-test('can push component at the start of root', function () {
+test('can push component at the start of root', function (): void {
     $this->schema->components([TextInput::make('email')]);
     $this->builder->pushComponents([TextInput::make('name')], InsertPosition::BEFORE);
 
     $keys = array_keys($this->schema->getFlatComponents());
     expect($keys)->toBe(['name', 'email']);
 });
-test('can push component when target component not exists', function () {
+test('can push component when target component not exists', function (): void {
     $this->schema->components([TextInput::make('name')]);
     $this->builder->pushComponents(
         [TextInput::make('name_before')], InsertPosition::BEFORE, targetKey: "missing"
@@ -42,7 +44,7 @@ test('can push component when target component not exists', function () {
     expect($keys)->toBe(['name_before', 'name', 'name_after']);
 });
 
-test('can insert before a specific component at root', function () {
+test('can insert before a specific component at root', function (): void {
     $this->schema->components([
         TextInput::make('email'),
         TextInput::make('lastname'),
@@ -58,7 +60,7 @@ test('can insert before a specific component at root', function () {
     expect($keys)->toBe(['email', 'firstname', 'lastname']);
 });
 
-test('can insert after a specific component at root', function () {
+test('can insert after a specific component at root', function (): void {
     $this->schema->components([
         TextInput::make('email'),
         TextInput::make('lastname'),
@@ -74,7 +76,7 @@ test('can insert after a specific component at root', function () {
     expect($keys)->toBe(['email', 'middlename', 'lastname']);
 });
 
-test('can insert into nested group specific component', function () {
+test('can insert into nested group specific component', function (): void {
     $this->schema->components([
         Group::make([
             TextInput::make('lastname'),
@@ -102,14 +104,14 @@ test('can insert into nested group specific component', function () {
     ]);
 });
 
-test('throws exception when target group not found', function () {
+test('throws exception when target group not found', function (): void {
     $this->builder->pushComponents([TextInput::make('email')], targetGroup: 'nonexistent.group');
 })->throws(SchemaGroupNotFoundException::class);
 
 
 // REMOVING COMPONENTS
 
-test('can remove root components', function () {
+test('can remove root components', function (): void {
     $this->schema->components([
         TextInput::make('email'),
         TextInput::make('name'),
@@ -122,7 +124,7 @@ test('can remove root components', function () {
     expect($keys)->toBe(['email', 'test']);
 });
 
-test('can remove nested component using dot notation', function () {
+test('can remove nested component using dot notation', function (): void {
     $this->schema->components([
         Group::make([
             TextInput::make('firstname'),
@@ -140,7 +142,7 @@ test('can remove nested component using dot notation', function () {
     expect($keys)->toBe(['user', 'user.firstname', 'user.personal', 'user.personal.email']);
 });
 
-test('remove component silently ignore if component not exists', function () {
+test('remove component silently ignore if component not exists', function (): void {
     $this->schema->components([TextInput::make('email')]);
 
     $this->builder->removeComponents(['user.email']); // group does not exist

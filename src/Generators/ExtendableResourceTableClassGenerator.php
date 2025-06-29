@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace QuixLabs\FilamentExtendable\Generators;
 
+use RuntimeException;
 use Filament\Commands\FileGenerators\Resources\Schemas\ResourceTableClassGenerator;
 use Nette\PhpGenerator\Method;
 use QuixLabs\FilamentExtendable\Builders\TableBuilder;
@@ -22,9 +25,9 @@ class ExtendableResourceTableClassGenerator extends ResourceTableClassGenerator
         if (preg_match('/return\s+(.*?);?\s*$/s', trim($initialReturn), $matches)) {
             $tableContent = $matches[1];
         } else {
-            throw new \RuntimeException("Failed to extract return expression from parent method body.");
+            throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return TableBuilder::process($tableContent, static::class);");
+        $method->setBody("return TableBuilder::process({$tableContent}, static::class);");
     }
 }
