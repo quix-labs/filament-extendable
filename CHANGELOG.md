@@ -2,6 +2,12 @@
 
 All notable changes will be documented in this file.
 
+## v0.0.1-alpha.4 - 2025-07-01
+
+* generate filament resource using {fqn}::class instead of static::class
+
+**Full Changelog**: https://github.com/quix-labs/filament-extendable/compare/v0.0.1-alpha.3...v0.0.1-alpha.4
+
 ## v0.0.1-alpha.3 - 2025-06-29
 
 ### What's Changed
