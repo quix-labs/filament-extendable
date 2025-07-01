@@ -22,24 +22,24 @@ class ExtendableResourceClassGenerator extends ResourceClassGenerator
     protected function configureInfolistMethod(Method $method): void
     {
         parent::configureInfolistMethod($method);
-        if ($this->isSimple()) {
-            $this->injectSchemaBuilderInMethodBody($method, "static::class . ':infolist'");
+        if (!filled($this->getInfolistSchemaFqn())) {
+            $this->injectSchemaBuilderInMethodBody($method, "{$this->getBasename()}::class . ':infolist'");
         }
     }
 
     protected function configureFormMethod(Method $method): void
     {
         parent::configureFormMethod($method);
-        if ($this->isSimple()) {
-            $this->injectSchemaBuilderInMethodBody($method, "static::class . ':form'");
+        if (!filled($this->getFormSchemaFqn())) {
+            $this->injectSchemaBuilderInMethodBody($method, "{$this->getBasename()}::class . ':form'");
         }
     }
 
     protected function configureTableMethod(Method $method): void
     {
         parent::configureTableMethod($method);
-        if ($this->isSimple()) {
-            $this->injectTableBuilderInMethodBody($method, "static::class");
+        if (!filled($this->getTableFqn())) {
+            $this->injectTableBuilderInMethodBody($method, "{$this->getBasename()}::class");
         }
     }
 

@@ -28,6 +28,6 @@ class ExtendableResourceTableClassGenerator extends ResourceTableClassGenerator
             throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return FilamentExtendable::processTable({$tableContent}, static::class);");
+        $method->setBody("return FilamentExtendable::processTable({$tableContent}, {$this->getBasename()}::class);");
     }
 }

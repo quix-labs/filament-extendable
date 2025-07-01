@@ -28,6 +28,6 @@ class ExtendableResourceFormSchemaClassGenerator extends ResourceFormSchemaClass
             throw new RuntimeException("Failed to extract return expression from parent method body.");
         }
 
-        $method->setBody("return FilamentExtendable::processSchema({$schemaContent}, static::class);");
+        $method->setBody("return FilamentExtendable::processSchema({$schemaContent}, {$this->getBasename()}::class);");
     }
 }
