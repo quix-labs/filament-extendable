@@ -2,6 +2,11 @@
 
 All notable changes will be documented in this file.
 
+## v0.0.1-alpha.5 - 2025-07-02
+
+- fix: OOM crash when inserting components in group
+  **Full Changelog**: https://github.com/quix-labs/filament-extendable/compare/v0.0.1-alpha.4...v0.0.1-alpha.5
+
 ## v0.0.1-alpha.4 - 2025-07-01
 
 * generate filament resource using {fqn}::class instead of static::class
