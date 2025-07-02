@@ -70,19 +70,80 @@ class SchemaBuilder
         }
 
         // Retrieve the nested target group component
-        $targetComponent = $this->schema->getComponent($targetGroup);
-        if ($targetComponent === null) {
+        $targetComponent = $this->findNestedComponent(explode('.', $targetGroup), $this->schema);
+        if (!$targetComponent instanceof Component) {
             throw new SchemaGroupNotFoundException($targetGroup);
         }
 
         // Insert components into the target group's children directly
-        $childComponents = $targetComponent->getChildComponents();
+        $childComponents = $targetComponent->getDefaultChildComponents();
         $updatedChildren = $this->insertAt($childComponents, $components, $position, $targetKey);
 
         // Set updated children back into the target component (modifies by reference)
         $targetComponent->components($updatedChildren);
 
         return $this;
+    }
+
+    /**
+     * Remove components from the schema or a nested group using their keys.
+     *
+     * Dot notation is supported for nested group paths (e.g. "tabs.seo.meta_title").
+     *
+     * @param string[] $keys Keys of the components to remove
+     */
+    public function removeComponents(array $keys): self
+    {
+        foreach ($keys as $fullKey) {
+            $tree = explode('.', $fullKey);
+            $fieldKey = array_pop($tree);
+            $groupPath = count($tree) === 0 ? null : implode('.', $tree);
+
+            // Return root or section/grid/tab/... when needed
+            $parent = empty($groupPath) ? $this->schema : $this->schema->getComponent(implode('.', $tree));
+            if (!$parent) {
+                continue;
+            }
+
+            $components = match (true) {
+                is_a($parent, Schema::class) => $parent->getComponents(),
+                is_a($parent, Component::class) => $parent->getChildComponents(),
+            };
+
+            foreach ($components as $i => $component) {
+                if ($component->getKey(false) === $fieldKey) {
+                    array_splice($components, $i, 1);
+                    $parent->components($components);
+                    break;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use this function because ->getComponent('path') cause OOM
+     */
+    protected function findNestedComponent(array $segments, Component|Schema $parent): ?Component
+    {
+        $currentKey = array_shift($segments);
+
+        $children = $parent instanceof Schema
+            ? $parent->getComponents(withHidden: true)
+            : $parent->getDefaultChildComponents();
+
+        foreach ($children as $child) {
+            if ($child->getKey(false) !== $currentKey) {
+                continue;
+            }
+
+            return $segments === []
+                ? $child
+                : $this->findNestedComponent($segments, $child);
+        }
+
+        return null;
     }
 
     /**
@@ -125,43 +186,5 @@ class SchemaBuilder
             InsertPosition::BEFORE => [...$toInsert, ...$components],
             InsertPosition::AFTER => [...$components, ...$toInsert],
         };
-    }
-
-
-    /**
-     * Remove components from the schema or a nested group using their keys.
-     *
-     * Dot notation is supported for nested group paths (e.g. "tabs.seo.meta_title").
-     *
-     * @param string[] $keys Keys of the components to remove
-     */
-    public function removeComponents(array $keys): self
-    {
-        foreach ($keys as $fullKey) {
-            $tree = explode('.', $fullKey);
-            $fieldKey = array_pop($tree);
-            $groupPath = count($tree) === 0 ? null : implode('.', $tree);
-
-            // Return root or section/grid/tab/... when needed
-            $parent = empty($groupPath) ? $this->schema : $this->schema->getComponent(implode('.', $tree));
-            if (!$parent) {
-                continue;
-            }
-
-            $components = match (true) {
-                is_a($parent, Schema::class) => $parent->getComponents(),
-                is_a($parent, Component::class) => $parent->getChildComponents(),
-            };
-
-            foreach ($components as $i => $component) {
-                if ($component->getKey(false) === $fieldKey) {
-                    array_splice($components, $i, 1);
-                    $parent->components($components);
-                    break;
-                }
-            }
-        }
-
-        return $this;
     }
 }
