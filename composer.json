@@ -20,7 +20,7 @@
   "require": {
     "php": "^8.2",
     "illuminate/support": "^11.28|^12.0",
-    "filament/filament": "^v4.0.0-beta5"
+    "filament/filament": "^v4.0.0-beta5 || ^5.0.0"
   },
   "require-dev": {
     "driftingly/rector-laravel": "^2.0",
